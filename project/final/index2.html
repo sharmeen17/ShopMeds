@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MediShop - Buy Medicines</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style2.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <nav>
+        <span>    
+            <span class="search-wrapper">
+                <input type="search" placeholder="search meds" id="search" data-search>
+                <img src="bell.png" alt="cart_icon" width="17px" height="17px">
+                <a href="cart.html" class="view-cart">
+                    <span>
+                        <img src="cart_icon.png" alt="cart_icon" width="15px" height="15px"><span id="cartCount" style="position: absolute; top: -5px; right: -10px; background: red; border-radius: 50%; padding: 2px 5px; font-size: 0.8em;">0</span>
+                    </span>
+                </a>
+            </span>
+        </span>
+    </nav>
+    <span id="cartCount">0</span>
+    <!-- <a href="cart.html" class="view-cart">View Cart (<span id="cartCount">0</span>)</a> -->
+    <div class="medicine-list" id="medicineList">
+        <!-- Medicines will be added here by JavaScript -->
+    </div>
+
+    <!-- Medicine Details Modal -->
+    <div class="medicine-modal" id="medicineModal">
+        <div class="modal-content">
+            <h2 id="medName"></h2>
+            <p id="medDesc"></p>
+            <p>Price: $<span id="medPrice"></span></p>
+            <p id="medPrescription"></p>
+            <button onclick="addToCart(currentMedicineId)">Add to Cart</button>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</body>
+</html>

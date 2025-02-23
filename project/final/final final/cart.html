@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediShop - Your Cart</title>
+
+    <style>
+        .cart-item {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.cart-item h4 {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.cart-item p {
+    margin: 5px 0;
+}
+
+.cart-item button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background-color: #ff1a1a;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Cart Sidebar -->
+<div id="cartSidebar" class="hidden fixed right-0 top-0 w-80 h-full bg-white shadow-xl p-4 flex flex-col">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold">Your Cart</h3>
+        <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+            ✕
+        </button>
+    </div>
+    
+    <!-- Cart Items -->
+    <div id="cartItems" class="flex-1 overflow-y-auto space-y-4">
+        <!-- Cart items will be dynamically inserted here -->
+    </div>
+
+    
+    <!-- Cart Total -->
+    <div class="border-t pt-4">
+        <div class="flex justify-between font-bold mb-4">
+            <span>Total:</span>
+            <span>$<span id="cartTotal">0</span></span>
+        </div>
+        <button onclick="checkout()" 
+                class="bg-green-500 text-white w-full py-3 rounded-lg hover:bg-green-600">
+            Proceed to Checkout
+
+            Checkout Now
+        </button>
+    </div>
+</div>
+
+<!-- Cart Toggle Button (add this near cart link in nav) -->
+    <button onclick="toggleCart()" class="hover:text-blue-600">
+        View Cart (<span id="cartCount">0</span>)
+
+    Cart (<span id="cartCount">0</span>)
+</button>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Toggle Cart Visibility
+function toggleCart() {
+    const cartSidebar = document.getElementById('cartSidebar');
+    cartSidebar.classList.toggle('hidden');
+}
+
+// Updated Add to Cart Function
+function addToCart(medicineId) {
+    const medicine = medicines.find(m => m.id === medicineId);
+    const existingItem = cart.find(item => item.id === medicineId);
+
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({ ...medicine, quantity: 1 });
+    }
+    
+    updateCartDisplay();
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+// Remove Item from Cart
+function removeFromCart(medicineId) {
+    cart = cart.filter(item => item.id !== medicineId);
+    updateCartDisplay();
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+// Update Quantity
+function updateQuantity(medicineId, change) {
+    const item = cart.find(item => item.id === medicineId);
+    item.quantity += change;
+
+    if (item.quantity < 1) {
+        removeFromCart(medicineId);
+    } else {
+        updateCartDisplay();
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+}
+
+// Updated Cart Display
+function updateCartDisplay() {
+    // Update Cart Count
+    document.getElementById('cartCount').textContent = 
+        cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    // Update Cart Items
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item border-b pb-4">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h4 class="font-medium">${item.name}</h4>
+                    <p class="text-sm text-gray-500">$${item.price} each</p>
+                </div>
+                <button onclick="removeFromCart(${item.id})" 
+                        class="text-red-500 hover:text-red-700">
+                    ✕
+                </button>
+            </div>
+            
+            <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center space-x-2">
+                    <button onclick="updateQuantity(${item.id}, -1)"
+                            class="px-2 py-1 border rounded hover:bg-gray-100">
+                        -
+                    </button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQuantity(${item.id}, 1)"
+                            class="px-2 py-1 border rounded hover:bg-gray-100">
+                        +
+                    </button>
+                </div>
+                <span class="font-medium">
+                    $${(item.price * item.quantity).toFixed(2)}
+                </span>
+            </div>
+        </div>
+    `).join('');
+
+    // Update Total
+    document.getElementById('cartTotal').textContent = 
+        cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+           .toFixed(2);
+}
+
+// Updated Checkout
+function checkout() {
+    if (cart.length === 0) return alert("Your cart is empty!");
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    if (confirm(`Proceed to pay $${total.toFixed(2)}?`)) {
+        cart = [];
+        updateCartDisplay();
+        localStorage.removeItem('cart');
+        alert('Thank you for your order!');
+        toggleCart();
+    }
+}
+
+// Initialize cart on page load
+updateCartDisplay();
+</script>
+</body>
+</html>
